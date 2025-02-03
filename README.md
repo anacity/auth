@@ -1,4 +1,4 @@
-## Documentação da API de Autenticação 🔐
+## API de Autenticação 🔐
 
 ### Descrição 
 Esta API tem como objetivo fornecer um sistema de autenticação e autorização baseado em JWT (JSON Web Token), permitindo que usuários se autentiquem, obtenham tokens de acesso e acessem recursos protegidos com base em suas permissões (admin ou user).
