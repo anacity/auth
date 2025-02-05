@@ -149,14 +149,140 @@ public class Usuario implements UserDetails {
 }
 ```
 
-### Como Funciona o Fluxo de Autenticação 🔄
+### Como Funciona o Fluxo de Autenticação 🔄:
 
-1. O cliente envia uma solicitação de login (`POST /auth`) com o login e senha.
-2. O servidor autentica o usuário e gera um token JWT.
-3. O token é enviado de volta para o cliente.
-4. O cliente deve incluir o token nas requisições subsequentes no cabeçalho `Authorization` como um Bearer Token.
-5. O filtro `SecurityFilter` verifica a validade do token antes de permitir o acesso ao recurso protegido.
-6. O usuário pode acessar os recursos conforme suas permissões (baseadas no papel de "ADMIN" ou "USER").
+```mermaid
+flowchart TD
+    A["Cliente envia solicitação de login (POST /auth)"] --> B{"Servidor autentica usuário e gera token JWT"}
+    B --> C["Token JWT gerado"]
+    C --> D["Token enviado de volta para o cliente"]
+    D --> E["Cliente inclui token nas requisições subsequentes no cabeçalho Authorization"]
+    E --> F{"SecurityFilter verifica validade do token"}
+    F -->|Válido| G["Usuário acessa recurso protegido"]
+    F -->|Inválido| H["Erro de autenticação"]
+    G --> I{"Verificação de permissões"}
+    I -->|ADMIN| J["Acesso ao recurso como ADMIN"]
+    I -->|USER| K["Acesso ao recurso como USER"]
+    H --> L["Fim"]
+    J --> L
+    K --> L
+```
 
 ### Banco de Dados 🗄️
 A API utiliza o banco de dados H2 para armazenar usuários. Os usuários são persistidos na tabela `TB_USUARIO`, e seus dados incluem: `id`, `nome`, `login`, `senha`, e `role`.
+
+### Diagrama de classes:
+```mermaid
+classDiagram
+    class SecurityConfiguration {
+        +SecurityFilter securityFilter
+        +SecurityFilterChain securityFilterChain(HttpSecurity)
+        +PasswordEncoder passwordEncoder()
+        +AuthenticationManager authenticationManager(AuthenticationConfiguration)
+    }
+
+    class SecurityFilter {
+        +AutenticacaoService autenticacaoService
+        +UsuarioRepository usuarioRepository
+        +doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain)
+        +extraiTokenHeader(HttpServletRequest)
+    }
+
+    class AutenticacaoController {
+        +AuthenticationManager authenticationManager
+        +AutenticacaoService autenticacaoService
+        +auth(AuthDto authDto)
+    }
+
+    class UsuarioController {
+        +UsuarioService usuarioService
+        +salvar(UsuarioDto usuarioDto)
+        +getAdmin()
+        +getUser()
+    }
+
+    class AuthDto {
+        +String login
+        +String senha
+    }
+
+    class UsuarioDto {
+        +String nome
+        +String login
+        +String senha
+        +RoleEnum role
+    }
+
+    class RoleEnum {
+        +String role
+        +ADMIN("admin")
+        +USER("user")
+    }
+
+    class Usuario {
+        +Long id
+        +String nome
+        +String login
+        +String senha
+        +RoleEnum role
+        +Collection<GrantedAuthority> getAuthorities()
+        +String getPassword()
+        +String getUsername()
+        +boolean isAccountNonExpired()
+        +boolean isAccountNonLocked()
+        +boolean isCredentialsNonExpired()
+        +boolean isEnabled()
+    }
+
+    class UsuarioRepository {
+        +Usuario findByLogin(String login)
+    }
+
+    class AutenticacaoServiceImpl {
+        +UsuarioRepository usuarioRepository
+        +loadUserByUsername(String login)
+        +obterToken(AuthDto authDto)
+        +gerarTokenJwt(Usuario usuario)
+        +validaTokenJwt(String token)
+        +gerarDataExpiracao()
+    }
+
+    class UsuarioServiceImpl {
+        +UsuarioRepository usuarioRepository
+        +PasswordEncoder passwordEncoder
+        +salvar(UsuarioDto usuarioDto)
+    }
+
+    class AutenticacaoService {
+        <<interface>>
+        +String obterToken(AuthDto authDto)
+        +String validaTokenJwt(String token)
+    }
+
+    class UsuarioService {
+        <<interface>>
+        +UsuarioDto salvar(UsuarioDto usuarioDto)
+    }
+
+    class AuthApplication {
+        +main(String[] args)
+    }
+
+    SecurityConfiguration --> SecurityFilter : has
+    SecurityConfiguration --> SecurityFilterChain : creates
+    SecurityFilter --> AutenticacaoService : uses
+    SecurityFilter --> UsuarioRepository : uses
+    AutenticacaoController --> AuthenticationManager : uses
+    AutenticacaoController --> AutenticacaoService : uses
+    UsuarioController --> UsuarioService : uses
+    UsuarioDto --> RoleEnum : uses
+    Usuario --> RoleEnum : has
+    Usuario --> GrantedAuthority : implements
+    UsuarioRepository --> Usuario : finds
+    AutenticacaoServiceImpl --> UsuarioRepository : uses
+    UsuarioServiceImpl --> UsuarioRepository : uses
+    UsuarioServiceImpl --> PasswordEncoder : uses
+    AutenticacaoServiceImpl --> AutenticacaoService : implements
+    UsuarioServiceImpl --> UsuarioService : implements
+    AuthApplication --> SpringApplication : starts
+```
