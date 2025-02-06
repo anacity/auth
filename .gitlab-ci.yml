@@ -1,0 +1,40 @@
+stages:
+  - build
+  - test
+  - deploy
+
+# Etapa de Build
+build:
+  stage: build
+  script:
+    - echo "Building Docker Image"
+    - docker build -t my-java-app:$CI_COMMIT_SHA .
+    - docker images
+
+# Etapa de Testes
+test:
+  stage: test
+  script:
+    - echo "Running Tests in Docker"
+    - docker run my-java-app:$CI_COMMIT_SHA test
+
+# Etapa de Push para Docker Registry
+push:
+  stage: push
+  script:
+    - echo "Logging in to Docker Registry"
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD  # Realiza o login no Docker Registry
+    - echo "Pushing the image to Docker Registry"
+    - docker push my-java-app:$CI_COMMIT_SHA  # Push da imagem com a tag do commit
+
+# Etapa de Deploy no Kubernetes
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to Kubernetes"
+    - kubectl config set-cluster my-cluster --server=$K8S_SERVER --certificate-authority=$K8S_CA
+    - kubectl config set-credentials deployer --token=$K8S_TOKEN
+    - kubectl config set-context my-context --cluster=my-cluster --user=deployer
+    - kubectl config use-context my-context
+    - kubectl set image deployment/myapp my-java-app=my-java-app:$CI_COMMIT_SHA
+    - kubectl rollout status deployment/my-java-app
