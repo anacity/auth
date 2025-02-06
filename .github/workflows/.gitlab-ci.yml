@@ -1,41 +1,18 @@
-stages:
-  - build
-  - test
-  - push
-  - deploy
-
-# Etapa de Build
-build:
-  stage: build
-  script:
-    - echo "Building Docker Image"
-    - docker build -t my-java-app:$CI_COMMIT_SHA .
-    - docker images
-
-# Etapa de Testes
-test:
-  stage: test
-  script:
-    - echo "Running Tests in Docker"
-    - docker run my-java-app:$CI_COMMIT_SHA test
-
-# Etapa de Push para Docker Registry
-push:
-  stage: push
-  script:
-    - echo "Logging in to Docker Registry"
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD  # Realiza o login no Docker Registry
-    - echo "Pushing the image to Docker Registry"
-    - docker push my-java-app:$CI_COMMIT_SHA  # Push da imagem com a tag do commit
-
-# Etapa de Deploy no Kubernetes
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploying to Kubernetes"
-    - kubectl config set-cluster my-cluster --server=$K8S_SERVER --certificate-authority=$K8S_CA
-    - kubectl config set-credentials deployer --token=$K8S_TOKEN
-    - kubectl config set-context my-context --cluster=my-cluster --user=deployer
-    - kubectl config use-context my-context
-    - kubectl set image deployment/myapp my-java-app=my-java-app:$CI_COMMIT_SHA
-    - kubectl rollout status deployment/my-java-app
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
