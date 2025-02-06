@@ -25,14 +25,12 @@ jobs:
       - name: Set up JDK 17 (Adoptium Temurin)
         uses: actions/setup-java@v2
         with:
-          java-version: '17'   # Usando JDK 17 agora
-          distribution: 'temurin'  # Usando Adoptium (temurin) no lugar de 'adoptopenjdk'
+          java-version: '17'   # Usando JDK 17
+          distribution: 'temurin'  # Usando Adoptium (temurin)
 
-      # Passo 3: Configurar o Maven
-      - name: Set up Maven
-        uses: actions/setup-java@v2
-        with:
-          maven-version: '3.6.3'
+      # Passo 3: Instalar o Maven no Ubuntu
+      - name: Install Maven
+        run: sudo apt-get install -y maven
 
       # Passo 4: Instalar dependências e empacotar a aplicação usando Maven
       - name: Build with Maven
@@ -42,7 +40,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t my-java-app:$GITHUB_SHA .
-      
+
       # Passo 6: Testar a imagem Docker (opcional)
       - name: Test Docker Image
         run: |
