@@ -1,41 +1,74 @@
-stages:
-  - build
-  - test
-  - push
-  - deploy
+name: Build and Deploy Java Application
 
-# Etapa de Build
-build:
-  stage: build
-  script:
-    - echo "Building Docker Image"
-    - docker build -t my-java-app:$CI_COMMIT_SHA .
-    - docker images
+on:
+  push:
+    branches:
+      - main
 
-# Etapa de Testes
-test:
-  stage: test
-  script:
-    - echo "Running Tests in Docker"
-    - docker run my-java-app:$CI_COMMIT_SHA test
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  K8S_SERVER: ${{ secrets.K8S_SERVER }}
+  K8S_TOKEN: ${{ secrets.K8S_TOKEN }}
+  K8S_CA: ${{ secrets.K8S_CA }}
+  MAVEN_HOME: /opt/maven
 
-# Etapa de Push para Docker Registry
-push:
-  stage: push
-  script:
-    - echo "Logging in to Docker Registry"
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD  # Realiza o login no Docker Registry
-    - echo "Pushing the image to Docker Registry"
-    - docker push my-java-app:$CI_COMMIT_SHA  # Push da imagem com a tag do commit
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Passo 1: Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-# Etapa de Deploy no Kubernetes
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploying to Kubernetes"
-    - kubectl config set-cluster my-cluster --server=$K8S_SERVER --certificate-authority=$K8S_CA
-    - kubectl config set-credentials deployer --token=$K8S_TOKEN
-    - kubectl config set-context my-context --cluster=my-cluster --user=deployer
-    - kubectl config use-context my-context
-    - kubectl set image deployment/myapp my-java-app=my-java-app:$CI_COMMIT_SHA
-    - kubectl rollout status deployment/my-java-app
+      # Passo 2: Configurar o JDK 17 com Adoptium (temurin)
+      - name: Set up JDK 17 (Adoptium Temurin)
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'   # Usando JDK 17
+          distribution: 'temurin'  # Usando Adoptium (temurin)
+
+      # Passo 3: Instalar o Maven no Ubuntu
+      - name: Install Maven
+        run: sudo apt-get install -y maven
+
+      # Passo 4: Navegar até o diretório correto e rodar o Maven
+      - name: Build with Maven
+        run: |
+          cd auth/auth  # Navegar para o diretório onde está o pom.xml
+          mvn clean install -DskipTests
+
+      # Passo 5: Criar a imagem Docker
+      - name: Build Docker Image
+        run: |
+          docker build -t my-java-app:$GITHUB_SHA .
+
+      # Passo 6: Testar a imagem Docker (opcional)
+      - name: Test Docker Image
+        run: |
+          docker run my-java-app:$GITHUB_SHA java -jar /path/to/your/app.jar --version
+
+      # Passo 7: Login no Docker Hub e Push da imagem
+      - name: Login to Docker Hub
+        run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+      - name: Push Docker Image to Registry
+        run: docker push my-java-app:$GITHUB_SHA
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      # Passo 8: Configuração e Deploy no Kubernetes
+      - name: Set up Kubernetes
+        run: |
+          kubectl config set-cluster my-cluster --server=$K8S_SERVER --certificate-authority=$K8S_CA
+          kubectl config set-credentials deployer --token=$K8S_TOKEN
+          kubectl config set-context my-context --cluster=my-cluster --user=deployer
+          kubectl config use-context my-context
+
+      # Passo 9: Deploy da imagem no Kubernetes
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/my-app my-java-app=my-java-app:$GITHUB_SHA
+          kubectl rollout status deployment/my-app
