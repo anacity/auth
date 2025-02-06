@@ -31,6 +31,9 @@ jobs:
       - name: Install Git LFS
         run: git lfs install
 
+      - name: List Git LFS files
+        run: git lfs ls-files
+
       - name: Pull Git LFS files
         run: git lfs pull
 
