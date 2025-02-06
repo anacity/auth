@@ -21,33 +21,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Passo 2: Configurar o Maven
-      - name: Set up JDK 17
+      # Passo 2: Configurar o JDK 17 com Adoptium (temurin)
+      - name: Set up JDK 17 (Adoptium Temurin)
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
-          distribution: 'adoptopenjdk'
+          java-version: '17'   # Usando JDK 17 agora
+          distribution: 'temurin'  # Usando Adoptium (temurin) no lugar de 'adoptopenjdk'
 
+      # Passo 3: Configurar o Maven
       - name: Set up Maven
         uses: actions/setup-java@v2
         with:
-          maven-version: '3.9.9'
+          maven-version: '3.6.3'
 
-      # Passo 3: Instalar dependências e empacotar a aplicação usando Maven
+      # Passo 4: Instalar dependências e empacotar a aplicação usando Maven
       - name: Build with Maven
         run: mvn clean install -DskipTests
 
-      # Passo 4: Criar a imagem Docker
+      # Passo 5: Criar a imagem Docker
       - name: Build Docker Image
         run: |
           docker build -t my-java-app:$GITHUB_SHA .
       
-      # Passo 5: Testar a imagem Docker (opcional)
+      # Passo 6: Testar a imagem Docker (opcional)
       - name: Test Docker Image
         run: |
-          docker run my-java-app:$GITHUB_SHA java -jar C:\Users\dti09\Downloads\auth\auth\target\auth-0.0.1-SNAPSHOT.jar --version
+          docker run my-java-app:$GITHUB_SHA java -jar /path/to/your/app.jar --version
 
-      # Passo 6: Login no Docker Hub e Push da imagem
+      # Passo 7: Login no Docker Hub e Push da imagem
       - name: Login to Docker Hub
         run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
@@ -58,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      # Passo 7: Configuração e Deploy no Kubernetes
+      # Passo 8: Configuração e Deploy no Kubernetes
       - name: Set up Kubernetes
         run: |
           kubectl config set-cluster my-cluster --server=$K8S_SERVER --certificate-authority=$K8S_CA
@@ -66,8 +67,8 @@ jobs:
           kubectl config set-context my-context --cluster=my-cluster --user=deployer
           kubectl config use-context my-context
 
-      # Passo 8: Deploy da imagem no Kubernetes
+      # Passo 9: Deploy da imagem no Kubernetes
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/my-app my-java-app=my-java-app:$GITHUB_SHA
-          kubectl rollout status deployment/my-java-app
+          kubectl rollout status deployment/my-app
