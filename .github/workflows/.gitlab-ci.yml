@@ -28,6 +28,12 @@ jobs:
           java-version: '17'   # Usando JDK 17
           distribution: 'temurin'  # Usando Adoptium (temurin)
 
+      - name: Install Git LFS
+        run: git lfs install
+
+      - name: Pull Git LFS files
+        run: git lfs pull
+
       # Passo 3: Instalar o Maven no Ubuntu
       - name: Install Maven
         run: sudo apt-get install -y maven
