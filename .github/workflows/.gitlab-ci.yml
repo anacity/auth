@@ -46,7 +46,7 @@ jobs:
       # Passo 6: Testar a imagem Docker (opcional)
       - name: Test Docker Image
         run: |
-          docker run my-java-app:$GITHUB_SHA java -jar auth/auth/auth/target/auth-0.0.1-SNAPSHOT.jar.original --version
+          docker run my-java-app:$GITHUB_SHA java -jar target/auth-0.0.1-SNAPSHOT.jar --version
 
       # Passo 7: Login no Docker Hub e Push da imagem
       - name: Login to Docker Hub
