@@ -63,23 +63,16 @@ jobs:
           chmod +x ./kubectl
           sudo mv ./kubectl /usr/local/bin/kubectl
 
-      - name: Set up Kubernetes
+      - name: Set up kubeconfig
         run: |
-          echo "$K8S_CA" | base64 --decode > /tmp/k8s_ca.crt
-          kubectl config set-cluster my-cluster --server=$K8S_SERVER --certificate-authority=/tmp/k8s_ca.crt
-          kubectl config set-credentials deployer --token=$K8S_TOKEN
-          kubectl config set-context my-context --cluster=my-cluster --user=deployer
-          kubectl config use-context my-context
+          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > /tmp/kubeconfig
+          export KUBECONFIG=/tmp/kubeconfig
 
-      - name: Debug Kubernetes config
+      - name: Verify cluster access
         run: |
-          kubectl config view
           kubectl get nodes
 
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/my-app anajumedina/my-java-app=anajumedina/my-java-app:latest
           kubectl rollout status deployment/my-app --timeout=300s || kubectl rollout undo deployment/my-app
-
-      - name: Clean up Kubernetes CA
-        run: rm -f /tmp/k8s_ca.crt
