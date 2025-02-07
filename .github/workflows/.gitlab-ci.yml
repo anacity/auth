@@ -44,7 +44,7 @@ jobs:
       # Passo 4: Navegar até o diretório correto e rodar o Maven
       - name: Build with Maven
         run: |
-          cd auth/auth/pom.xml  # Navegar para o diretório onde está o pom.xml
+          cd auth/pom.xml  # Navegar para o diretório onde está o pom.xml
           mvn clean install -DskipTests
 
       # Passo 5: Criar a imagem Docker
