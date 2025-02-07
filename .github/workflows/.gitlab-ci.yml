@@ -68,6 +68,12 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" | base64 --decode > /tmp/kubeconfig
           export KUBECONFIG=/tmp/kubeconfig
 
+      - name: Debug environment variables
+        run: |
+          echo "K8S_SERVER: $K8S_SERVER"
+          echo "K8S_CA: $K8S_CA"
+          echo "K8S_TOKEN: $K8S_TOKEN"
+
       - name: Verify cluster access
         run: |
           kubectl get nodes
