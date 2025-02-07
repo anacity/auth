@@ -50,7 +50,7 @@ jobs:
       # Passo 5: Criar a imagem Docker
       - name: Build Docker Image
         run: |
-          docker build -f auth/auth/Dockerfile -t my-java-app:$GITHUB_SHA .
+          docker build -f auth/Dockerfile -t my-java-app:$GITHUB_SHA .
 
       # Passo 6: Testar a imagem Docker (opcional)
       - name: Test Docker Image
