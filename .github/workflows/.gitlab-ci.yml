@@ -25,8 +25,8 @@ jobs:
       - name: Set up JDK 17 (Adoptium Temurin)
         uses: actions/setup-java@v2
         with:
-          java-version: '17'   # Usando JDK 17
-          distribution: 'temurin'  # Usando Adoptium (temurin)
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Install Git LFS
         run: git lfs install
@@ -55,7 +55,7 @@ jobs:
       # Passo 6: Testar a imagem Docker (opcional)
       - name: Test Docker Image
         run: |
-          docker run my-java-app:$GITHUB_SHA java -jar target/auth-0.0.1-SNAPSHOT.jar --version
+          docker run my-java-app:$GITHUB_SHA java -jar /app/target/auth-0.0.1-SNAPSHOT.jar --version  # Corrigir caminho
 
       # Passo 7: Login no Docker Hub e Push da imagem
       - name: Login to Docker Hub
