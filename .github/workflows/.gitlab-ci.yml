@@ -17,43 +17,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # Passo 1: Checkout do código
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Passo 2: Configurar o JDK 17 com Adoptium (temurin)
       - name: Set up JDK 17 (Adoptium Temurin)
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Git LFS
-        run: git lfs install
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: '3.8.6'
 
-      - name: List Git LFS files
-        run: git lfs ls-files
-
-      - name: Pull Git LFS files
-        run: git lfs pull
-
-      # Passo 3: Instalar o Maven no Ubuntu
-      - name: Install Maven
-        run: sudo apt-get install -y maven
-
-      # Passo 4: Navegar até o diretório correto e rodar o Maven
       - name: Build with Maven
         run: |
-          cd auth  # Navegar para o diretório onde está o pom.xml
-          mvn clean install -DskipTests
+          cd auth
+          mvn clean install
 
-      # Passo 5: Criar a imagem Docker
-      # Passo 5: Criar a imagem Docker
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Build Docker Image
         run: |
-          docker build -t anajumedina/my-java-app:latest ./auth
+          docker buildx build -t anajumedina/my-java-app:latest ./auth --load
 
-      # Passo 7: Login no Docker Hub e Push da imagem
       - name: Docker login
         uses: docker/login-action@v2
         with:
@@ -67,28 +57,29 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      # Passo 8: Instalar o kubectl
       - name: Install kubectl
         run: |
-          curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.21.2/bin/linux/amd64/kubectl"
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x ./kubectl
           sudo mv ./kubectl /usr/local/bin/kubectl
 
-      # Passo 9: Configuração e Deploy no Kubernetes
       - name: Set up Kubernetes
         run: |
-          # Cria um arquivo temporário com o certificado decodificado
           echo "$K8S_CA" | base64 --decode > /tmp/k8s_ca.crt
-          
-          # Configura o cluster com o certificado decodificado
           kubectl config set-cluster my-cluster --server=$K8S_SERVER --certificate-authority=/tmp/k8s_ca.crt
-          
           kubectl config set-credentials deployer --token=$K8S_TOKEN
           kubectl config set-context my-context --cluster=my-cluster --user=deployer
           kubectl config use-context my-context
 
-      # Passo 10: Deploy da imagem no Kubernetes
+      - name: Debug Kubernetes config
+        run: |
+          kubectl config view
+          kubectl get nodes
+
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/my-app anajumedina/my-java-app=anajumedina/my-java-app:latest
-          kubectl rollout status deployment/my-app
+          kubectl rollout status deployment/my-app --timeout=300s || kubectl rollout undo deployment/my-app
+
+      - name: Clean up Kubernetes CA
+        run: rm -f /tmp/k8s_ca.crt
