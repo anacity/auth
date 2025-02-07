@@ -77,10 +77,11 @@ jobs:
       # Passo 9: Configuração e Deploy no Kubernetes
       - name: Set up Kubernetes
         run: |
-          kubectl config set-cluster my-cluster --server=$K8S_SERVER --certificate-authority=$K8S_CA
+          kubectl config set-cluster my-cluster --server=$K8S_SERVER --embed-certs --certificate-authority-data="$K8S_CA"
           kubectl config set-credentials deployer --token=$K8S_TOKEN
           kubectl config set-context my-context --cluster=my-cluster --user=deployer
           kubectl config use-context my-context
+
 
       # Passo 10: Deploy da imagem no Kubernetes
       - name: Deploy to Kubernetes
