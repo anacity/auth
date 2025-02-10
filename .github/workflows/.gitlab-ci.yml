@@ -82,8 +82,8 @@ jobs:
         run: |
           pwd
           cd ..
-          ls -l 
-          sudo find /home/runner/work -name "deployment.yaml"
+          ls -R /home/runner/work/auth
+          sudo find /home/runner/work/auth/auth -name "deployment.yaml"
           kubectl apply -f deployment.yaml
 
       # Passo 4: Verificar Pods no Kubernetes
