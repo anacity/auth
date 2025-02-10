@@ -81,8 +81,8 @@ jobs:
       - name: Aplicar o Kubernetes Deployment
         run: |
           pwd
-          ls
-          kubectl apply -f auth/deployment.yaml
+          sudo find / -name "deployment.yaml"
+          kubectl apply -f deployment.yaml
 
       # Passo 4: Verificar Pods no Kubernetes
       - name: Verificar Pods no Kubernetes
