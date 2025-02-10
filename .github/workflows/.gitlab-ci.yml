@@ -6,6 +6,7 @@ on:
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  KUBECONFIG_BASE64: ${{ secrets.KUBECONFIG_BASE64}}
   MAVEN_HOME: /opt/maven
 
 jobs:
@@ -64,8 +65,9 @@ jobs:
       # Passo 1: Decodificar o kubeconfig do segredo base64
       - name: Set up Kubernetes context
         run: |
-          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > kubeconfig
+          echo "$KUBECONFIG_BASE64" | base64 --decode > kubeconfig
           export KUBECONFIG=kubeconfig
+          shell: bash
 
       # Passo 2: Configurar kubectl
       - name: Configurar kubectl
