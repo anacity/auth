@@ -94,7 +94,7 @@ jobs:
       # Passo 3: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
-          kubectl apply -f kubernetes/deployment.yaml
+          kubectl apply -f /home/runner/work/auth/auth/kubernetes/deployment.yaml
           working-directory: ./kubernetes
 
       # Passo 4: Verificar Pods no Kubernetes
