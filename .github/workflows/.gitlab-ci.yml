@@ -16,6 +16,14 @@ jobs:
       # Passo 1: Checkout do código
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0   # Garante o clone raso, para apenas o último commit
+
+      - name: Verificar o conteúdo do repositório
+        run: |
+          pwd
+          echo "Conteúdo da pasta do repositório:"
+          ls -R
 
       # Passo 2: Configurar o JDK 17 com Adoptium (temurin)
       - name: Set up JDK 17 (Adoptium Temurin)
@@ -58,6 +66,12 @@ jobs:
       - name: Push Docker Image to Registry
         run: docker push anajumedina/my-java-app:${GITHUB_SHA}
 
+      - name: Verificar o conteúdo do repositório 2
+        run: |
+          pwd
+          echo "Conteúdo da pasta do repositório:"
+          ls -R
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -80,10 +94,8 @@ jobs:
       # Passo 3: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
-          ls -R /home/runner/work/_PipelineMapping/anacity
-          ls -R /home/runner/work/auth
-          ls -R /home/runner/work/auth/auth
-          kubectl apply -f kubernetes/deployment.yaml
+          kubectl apply -f /home/runner/work/auth/auth/kubernetes/deployment.yaml
+          working-directory: ./kubernetes
 
       # Passo 4: Verificar Pods no Kubernetes
       - name: Verificar Pods no Kubernetes
