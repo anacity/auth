@@ -95,6 +95,7 @@ jobs:
       - name: Aplicar o Kubernetes Deployment
         run: |
           pwd
+          cd ..
           ls -R
           kubectl apply -f .github/workflows/deployment.yaml
 
