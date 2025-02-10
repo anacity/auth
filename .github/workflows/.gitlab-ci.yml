@@ -63,12 +63,12 @@ jobs:
     needs: build
     steps:
       # Passo 1: Decodificar o kubeconfig do segredo base64
-      - name: Criar kubeconfig
+      - name: Set up Kubernetes context
         run: |
-         echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 -d > kubeconfig
-         cat kubeconfig  # Para verificar o conteúdo
+         echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > kubeconfig
          export KUBECONFIG=kubeconfig
          shell: bash
+
 
       # Passo 2: Configurar kubectl
       - name: Configurar kubectl
