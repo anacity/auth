@@ -66,6 +66,12 @@ jobs:
       - name: Push Docker Image to Registry
         run: docker push anajumedina/my-java-app:${GITHUB_SHA}
 
+      - name: Verificar o conteúdo do repositório 2
+        run: |
+          pwd
+          echo "Conteúdo da pasta do repositório:"
+          ls -R
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
