@@ -42,16 +42,12 @@ jobs:
           cd auth  # Navegar para o diretório onde está o pom.xml
           mvn clean install -DskipTests
 
-      # Passo 5: Criar a imagem Docker
-      - name: Set up Docker Buildx
-        run: |
-          docker buildx create --use
-          
+      # Paaso 5: Criar a imagem Docker 
       - name: Build Docker Image
         run: |
-          docker buildx build -t anajumedina/my-java-app:latest ./auth
+          docker build -t anajumedina/my-java-app:latest ./auth
 
-      # Passo 7: Login no Docker Hub e Push da imagem
+      # Passo 6: Login no Docker Hub e Push da imagem
       - name: Docker login
         uses: docker/login-action@v2
         with:
