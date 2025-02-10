@@ -16,6 +16,13 @@ jobs:
       # Passo 1: Checkout do código
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0   # Garante o clone raso, para apenas o último commit
+
+      - name: Verificar o conteúdo do repositório
+        run: |
+          echo "Conteúdo da pasta do repositório:"
+          ls -R
 
       # Passo 2: Configurar o JDK 17 com Adoptium (temurin)
       - name: Set up JDK 17 (Adoptium Temurin)
