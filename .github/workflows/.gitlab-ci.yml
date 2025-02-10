@@ -49,7 +49,7 @@ jobs:
           
       - name: Build Docker Image
         run: |
-          docker buildx build -t anajumedina/my-java-app:latest ./auth
+          docker build -t anajumedina/my-java-app:latest ./auth
 
       # Passo 7: Login no Docker Hub e Push da imagem
       - name: Docker login
