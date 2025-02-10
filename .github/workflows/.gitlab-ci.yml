@@ -80,6 +80,7 @@ jobs:
       # Passo 3: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
+          pwd
           kubectl apply -f auth/deployment.yaml
 
       # Passo 4: Verificar Pods no Kubernetes
