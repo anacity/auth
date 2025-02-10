@@ -21,6 +21,7 @@ jobs:
 
       - name: Verificar o conteúdo do repositório
         run: |
+          pwd
           echo "Conteúdo da pasta do repositório:"
           ls -R
 
@@ -87,10 +88,8 @@ jobs:
       # Passo 3: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
-          ls -R /home/runner/work/_PipelineMapping/anacity
-          ls -R /home/runner/work/auth
-          ls -R /home/runner/work/auth/auth
-          kubectl apply -f kubernetes/deployment.yaml
+          run: kubectl apply -f kubernetes/deployment.yaml
+          working-directory: ./kubernetes
 
       # Passo 4: Verificar Pods no Kubernetes
       - name: Verificar Pods no Kubernetes
