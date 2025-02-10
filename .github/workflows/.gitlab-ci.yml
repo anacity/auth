@@ -80,10 +80,7 @@ jobs:
       # Passo 3: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
-          pwd
-          cd ..
-          ls -R /home/runner/work/auth
-          sudo find /home/runner/work/auth/auth -name "deployment.yaml"
+          sudo find /home/runner/work/auth/ -name "kubernetes"
           kubectl apply -f kubernetes/deployment.yaml
 
       # Passo 4: Verificar Pods no Kubernetes
