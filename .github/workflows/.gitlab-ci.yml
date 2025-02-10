@@ -81,6 +81,7 @@ jobs:
       - name: Aplicar o Kubernetes Deployment
         run: |
           pwd
+          ls -l auth
           sudo find / -name "deployment.yaml"
           kubectl apply -f deployment.yaml
 
