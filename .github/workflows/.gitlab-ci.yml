@@ -94,6 +94,8 @@ jobs:
       # Passo 3: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
+          pwd
+          ls -R
           kubectl apply -f .github/workflows/deployment.yaml
 
       # Passo 4: Verificar Pods no Kubernetes
