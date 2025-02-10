@@ -81,6 +81,7 @@ jobs:
       - name: Aplicar o Kubernetes Deployment
         run: |
           pwd
+          cd ..
           ls -l 
           sudo find /home/runner/work -name "deployment.yaml"
           kubectl apply -f deployment.yaml
