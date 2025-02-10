@@ -80,9 +80,7 @@ jobs:
       # Passo 3: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
-          ls -R /home
-          ls -R /runner
-          ls -R /work
+          ls -R /home/runner/work/_PipelineMapping/anacity
           ls -R /home/runner/work/auth
           ls -R /home/runner/work/auth/auth
           kubectl apply -f kubernetes/deployment.yaml
