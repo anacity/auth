@@ -69,7 +69,6 @@ jobs:
           export KUBECONFIG=kubeconfig
           # Verificar se o KUBECONFIG foi configurado corretamente
           cat $KUBECONFIG
-          shell: bash
 
       # Passo 2: Configurar kubectl
       - name: Configurar kubectl
