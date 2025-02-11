@@ -97,7 +97,7 @@ jobs:
           pwd
           cd ..
           ls -R
-          kubectl apply -f .github/workflows/deployment.yaml
+          kubectl apply -f .auth/deployment.yaml
 
       # Passo 4: Verificar Pods no Kubernetes
       - name: Verificar Pods no Kubernetes
