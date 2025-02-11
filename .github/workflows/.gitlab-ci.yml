@@ -91,7 +91,16 @@ jobs:
           kubectl config set-context docker-desktop --cluster=docker-desktop --user=docker-desktop --namespace=default
           kubectl config use-context docker-desktop
 
-      # Passo 3: Aplicar o Kubernetes Deployment
+      # Passo 3: Verificar o conteúdo do repositório antes de aplicar o deployment
+      - name: Verificar conteúdo do repositório antes do deploy
+        run: |
+          pwd
+          echo "Conteúdo da pasta do repositório antes do deploy:"
+          ls -R
+          echo "Verificando o arquivo deployment.yaml..."
+          cat ./auth/deployment.yaml
+
+      # Passo 4: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
           pwd
@@ -99,7 +108,7 @@ jobs:
           ls -R
           kubectl apply -f ./auth/deployment.yaml
 
-      # Passo 4: Verificar Pods no Kubernetes
+      # Passo 5: Verificar Pods no Kubernetes
       - name: Verificar Pods no Kubernetes
         run: |
           kubectl get pods
