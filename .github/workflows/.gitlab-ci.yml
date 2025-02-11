@@ -104,19 +104,18 @@ jobs:
           kubectl config use-context docker-desktop
 
       # Passo 3: Verificar o conteúdo do repositório antes de aplicar o deployment
-      - name: Verificar conteúdo do repositório antes do deploy
-        run: |
-          pwd
-          echo "Conteúdo da pasta do repositório antes do deploy:"
-          ls -R
-          echo "Verificando o arquivo deployment.yaml..."
-          cat deployment.yaml
+      # - name: Verificar conteúdo do repositório antes do deploy
+      #   run: |
+      #     pwd
+      #     echo "Conteúdo da pasta do repositório antes do deploy:"
+      #     ls -R
+      #     echo "Verificando o arquivo deployment.yaml..."
+      #     cat deployment.yaml
 
       # Passo 4: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
           pwd
-          cd ..
           ls -R
           kubectl apply -f deployment.yaml
 
