@@ -110,7 +110,7 @@ jobs:
           echo "Conteúdo da pasta do repositório antes do deploy:"
           ls -R
           echo "Verificando o arquivo deployment.yaml..."
-          cat ./auth/deployment.yaml
+          cat ./auth/auth/deployment.yaml
 
       # Passo 4: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
@@ -118,7 +118,7 @@ jobs:
           pwd
           cd ..
           ls -R
-          kubectl apply -f ./auth/deployment.yaml
+          kubectl apply -f ./auth/auth/deployment.yaml
 
       # Passo 5: Verificar Pods no Kubernetes
       - name: Verificar Pods no Kubernetes
