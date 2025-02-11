@@ -72,10 +72,22 @@ jobs:
           echo "Conteúdo da pasta do repositório:"
           ls -R
 
+      - name: Salvar artefatos
+        uses: actions/upload-artifact@v3
+        with:
+          name: auth-artifacts
+          path: auth
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
+
+      - name: Baixar artefatos
+        uses: actions/download-artifact@v3
+        with:
+          name: auth-artifacts
+          path: auth
       # Passo 1: Decodificar o kubeconfig do segredo base64
       - name: Set up Kubernetes context
         run: |
