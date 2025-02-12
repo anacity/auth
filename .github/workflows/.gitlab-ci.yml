@@ -82,13 +82,33 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-
       - name: Baixar artefatos
         uses: actions/download-artifact@v4
         with:
           name: auth-artifacts
           path: auth
-      # Passo 1: Decodificar o kubeconfig do segredo base64
+
+      # Passo 1: Instalar o Minikube
+      - name: Install Minikube
+        run: |
+          curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          sudo mv minikube /usr/local/bin/
+          sudo chmod +x /usr/local/bin/minikube
+
+      # Passo 2: Instalar o kubectl
+      - name: Install kubectl
+        run: |
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.21.0/bin/linux/amd64/kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+          sudo chmod +x /usr/local/bin/kubectl
+
+      # Passo 3: Iniciar o Minikube
+      - name: Start Minikube
+        run: |
+          minikube start --driver=docker  # Usa o driver Docker no GitHub Actions
+          kubectl config use-context minikube  # Usar o contexto Minikube
+
+      # Passo 4: Decodificar o kubeconfig do segredo base64
       - name: Set up Kubernetes context
         run: |
           echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > kubeconfig
@@ -96,34 +116,12 @@ jobs:
           # Verificar se o KUBECONFIG foi configurado corretamente
           cat $KUBECONFIG
 
-      # Passo 2: Configurar kubectl
-      - name: Configurar kubectl
-        run: |
-          kubectl config get-contexts
-          kubectl config set-context docker-desktop --cluster=docker-desktop --user=docker-desktop --namespace=default
-          kubectl config use-context docker-desktop
-          kubectl cluster-info dump
-
-      # Verificar se o contexto foi corretamente configurado
-      - name: Verificar contexto do Kubernetes
-        run: |
-          kubectl config current-context  # Verifique qual contexto está sendo usado
-
-      # Passo 3: Verificar o conteúdo do repositório antes de aplicar o deployment
-      - name: Verificar conteúdo do repositório antes do deploy
-        run: |
-          pwd
-          echo "Conteúdo da pasta do repositório antes do deploy:"
-          ls -R
-          echo "Verificando o arquivo deployment.yaml..."
-          cat ./auth/deployment.yaml
-
-      # Passo 4: Aplicar o Kubernetes Deployment
+      # Passo 5: Aplicar o Kubernetes Deployment
       - name: Aplicar o Kubernetes Deployment
         run: |
           kubectl apply -f ./auth/deployment.yaml  --validate=false
 
-      # Passo 5: Verificar Pods no Kubernetes
+      # Passo 6: Verificar Pods no Kubernetes
       - name: Verificar Pods no Kubernetes
         run: |
           kubectl get pods
