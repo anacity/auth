@@ -104,7 +104,7 @@ A API utiliza o **Spring Security** para controlar o acesso aos endpoints, com b
 
 A configuração de segurança está definida na classe `SecurityConfiguration`, que define as permissões para cada endpoint da API:
 
-- **Endpoints públicos**: `/auth`, `/auth/refresh-token`, `/usuarios` (POST) são acessíveis sem autenticação.
+- **Endpoints públicos**: `/auth`, e `/usuarios` (POST) são acessíveis sem autenticação.
 - **Endpoints protegidos**: `/usuarios/admin` e `/usuarios/user` são restritos a usuários com as permissões apropriadas (roles "ADMIN" e "USER").
 
 ### Estrutura de Dados 📊
