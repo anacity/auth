@@ -33,7 +33,6 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 			.requestMatchers(HttpMethod.GET, "/usuarios").permitAll()			       
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
 			.requestMatchers(HttpMethod.GET, "/").permitAll()			      
                         .anyRequest().authenticated()
 				)
