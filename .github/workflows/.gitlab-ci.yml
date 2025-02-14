@@ -54,7 +54,8 @@ jobs:
       # Passo 5: Criar a imagem Docker
       - name: Build Docker Image
         run: |
-          docker build -t anajumedina/my-java-app:${GITHUB_SHA} ./auth
+          VERSION="v1.${{ github.run_number }}"
+          docker build -t anajumedina/my-java-app:$VERSION ./auth
 
       # Passo 6: Login no Docker Hub e Push da imagem
       - name: Docker login
@@ -64,7 +65,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Push Docker Image to Registry
-        run: docker push anajumedina/my-java-app:${GITHUB_SHA}
+        run: |
+          VERSION="v1.${{ github.run_number }}" 
+          docker push anajumedina/my-java-app:$VERSION
 
       - name: Verificar o conteúdo do repositório 2
         run: |
