@@ -88,12 +88,22 @@ A API utiliza o **Spring Security** para controlar o acesso aos endpoints, com b
 - **User**: Tem acesso apenas a endpoints específicos (por exemplo, `/usuarios/user`).
 
 ### Fluxo de Autenticação 🔄
-
-1. O usuário faz uma requisição para o endpoint `/auth` com suas credenciais (login e senha).
-2. O sistema valida as credenciais e gera um token JWT.
-3. O token é retornado para o cliente, que deve incluí-lo no cabeçalho das próximas requisições.
-4. O filtro de segurança (`SecurityFilter`) intercepta as requisições e valida o token JWT.
-5. Com o token validado, o usuário pode acessar os recursos protegidos de acordo com suas permissões.
+```mermaid
+flowchart TD
+    A["Cliente envia solicitação de login (POST /auth)"] --> B{"Servidor autentica usuário e gera token JWT"}
+    B --> C["Token JWT gerado"]
+    C --> D["Token enviado de volta para o cliente"]
+    D --> E["Cliente inclui token nas requisições subsequentes no cabeçalho Authorization"]
+    E --> F{"SecurityFilter verifica validade do token"}
+    F -->|Válido| G["Usuário acessa recurso protegido"]
+    F -->|Inválido| H["Erro de autenticação"]
+    G --> I{"Verificação de permissões"}
+    I -->|ADMIN| J["Acesso ao recurso como ADMIN"]
+    I -->|USER| K["Acesso ao recurso como USER"]
+    H --> L["Fim"]
+    J --> L
+    K --> L
+```
 
 ### Segurança 🔐
 
@@ -147,25 +157,6 @@ public class Usuario implements UserDetails {
     }
     // Outros métodos do UserDetails
 }
-```
-
-### Como Funciona o Fluxo de Autenticação 🔄:
-
-```mermaid
-flowchart TD
-    A["Cliente envia solicitação de login (POST /auth)"] --> B{"Servidor autentica usuário e gera token JWT"}
-    B --> C["Token JWT gerado"]
-    C --> D["Token enviado de volta para o cliente"]
-    D --> E["Cliente inclui token nas requisições subsequentes no cabeçalho Authorization"]
-    E --> F{"SecurityFilter verifica validade do token"}
-    F -->|Válido| G["Usuário acessa recurso protegido"]
-    F -->|Inválido| H["Erro de autenticação"]
-    G --> I{"Verificação de permissões"}
-    I -->|ADMIN| J["Acesso ao recurso como ADMIN"]
-    I -->|USER| K["Acesso ao recurso como USER"]
-    H --> L["Fim"]
-    J --> L
-    K --> L
 ```
 
 ### Banco de Dados 🗄️
